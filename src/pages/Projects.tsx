@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, X, ExternalLink, Github, ChevronDown, Loader } from 'lucide-react';
+import { Search, X, ChevronDown } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ScrollToTop from '../components/ScrollToTop';
