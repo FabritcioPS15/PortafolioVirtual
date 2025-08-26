@@ -2,146 +2,16 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, X, ExternalLink, Github, ChevronDown, Loader } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ScrollToTop from '../components/ScrollToTop';
+import { useLoading } from '../hooks/useLoading';
+import { projects, categories } from '../data/projects';
 
 const Projects: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  const [isLoading, setIsLoading] = useState(true);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [expandedProject, setExpandedProject] = useState<number | null>(null);
-
-  // Simular carga de datos
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    
-    // Configurar el evento de scroll
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 500);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const projects = [
-    {
-      id: 1,
-      title: 'E-commerce Platform',
-      description: 'Plataforma completa de comercio electrónico con React y Node.js',
-      image: 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg',
-      technologies: ['React', 'Node.js', 'MongoDB', 'Stripe', 'Express', 'Redux'],
-      category: 'fullstack',
-      link: '#',
-      github: '#',
-      longDescription: 'Una plataforma de comercio electrónico completa con funcionalidades avanzadas de carrito de compras, gestión de usuarios, procesamiento de pagos y panel de administración.',
-      features: [
-        'Carrito de compras avanzado',
-        'Sistema de autenticación seguro',
-        'Integración con Stripe para pagos',
-        'Panel de administración completo',
-        'Sistema de inventario en tiempo real',
-        'Notificaciones por email automáticas'
-      ],
-      date: '2023-05-15'
-    },
-    {
-      id: 2,
-      title: 'Task Management App',
-      description: 'Aplicación de gestión de tareas con funcionalidades avanzadas',
-      image: 'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg',
-      technologies: ['React', 'TypeScript', 'Firebase', 'Tailwind CSS'],
-      category: 'frontend',
-      link: '#',
-      github: '#',
-      date: '2023-03-10'
-    },
-    {
-      id: 3,
-      title: 'Analytics Dashboard',
-      description: 'Dashboard interactivo con visualización de datos en tiempo real',
-      image: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg',
-      technologies: ['Vue.js', 'D3.js', 'Express', 'Chart.js'],
-      category: 'frontend',
-      link: '#',
-      github: '#',
-      date: '2023-02-22'
-    },
-    {
-      id: 4,
-      title: 'Social Media API',
-      description: 'API RESTful para aplicación de redes sociales con autenticación JWT',
-      image: 'https://images.pexels.com/photos/3184433/pexels-photo-3184433.jpeg',
-      technologies: ['Node.js', 'Express', 'MongoDB', 'JWT', 'Socket.io'],
-      category: 'backend',
-      link: '#',
-      github: '#',
-      date: '2022-11-05'
-    },
-    {
-      id: 5,
-      title: 'Real Estate Portal',
-      description: 'Portal inmobiliario con búsqueda avanzada y mapas interactivos',
-      image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
-      technologies: ['React', 'Next.js', 'PostgreSQL', 'Mapbox', 'Prisma'],
-      category: 'fullstack',
-      link: '#',
-      github: '#',
-      date: '2022-09-30'
-    },
-    {
-      id: 6,
-      title: 'Weather App',
-      description: 'Aplicación del clima con geolocalización y pronósticos detallados',
-      image: 'https://images.pexels.com/photos/3184430/pexels-photo-3184430.jpeg',
-      technologies: ['React', 'OpenWeather API', 'Geolocation API', 'CSS3'],
-      category: 'frontend',
-      link: '#',
-      github: '#',
-      date: '2022-08-12'
-    },
-    {
-      id: 7,
-      title: 'Microservices Architecture',
-      description: 'Arquitectura de microservicios con Docker y Kubernetes',
-      image: 'https://images.pexels.com/photos/3184298/pexels-photo-3184298.jpeg',
-      technologies: ['Docker', 'Kubernetes', 'Node.js', 'Redis', 'PostgreSQL'],
-      category: 'backend',
-      link: '#',
-      github: '#',
-      date: '2022-07-18'
-    },
-    {
-      id: 8,
-      title: 'Mobile Banking App',
-      description: 'Aplicación móvil de banca con React Native y funciones biométricas',
-      image: 'https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg',
-      technologies: ['React Native', 'TypeScript', 'Redux', 'Biometric Auth'],
-      category: 'mobile',
-      link: '#',
-      github: '#',
-      date: '2022-06-05'
-    },
-  ];
-
-  const categories = [
-    { id: 'all', label: 'Todos', count: projects.length, icon: '⭐' },
-    { id: 'frontend', label: 'Frontend', count: projects.filter(p => p.category === 'frontend').length, icon: '🎨' },
-    { id: 'backend', label: 'Backend', count: projects.filter(p => p.category === 'backend').length, icon: '⚙️' },
-    { id: 'fullstack', label: 'Full Stack', count: projects.filter(p => p.category === 'fullstack').length, icon: '🚀' },
-    { id: 'mobile', label: 'Mobile', count: projects.filter(p => p.category === 'mobile').length, icon: '📱' },
-  ];
-
+  const isLoading = useLoading(1500);
   const sortOptions = [
     { id: 'newest', label: 'Más recientes' },
     { id: 'oldest', label: 'Más antiguos' },
@@ -175,36 +45,9 @@ const Projects: React.FC = () => {
     setSortBy('newest');
   };
 
-  const toggleProjectExpand = (id: number) => {
-    if (expandedProject === id) {
-      setExpandedProject(null);
-    } else {
-      setExpandedProject(id);
-    }
-  };
-
   // Componente de carga
   if (isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="min-h-screen pt-24 pb-16 px-4 flex items-center justify-center"
-      >
-        <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="inline-block mb-4"
-          >
-            <Loader size={40} className="text-teal-400" />
-          </motion.div>
-          <h2 className="text-xl font-semibold text-white">Cargando proyectos...</h2>
-          <p className="text-gray-400 mt-2">Preparando una muestra de mi trabajo</p>
-        </div>
-      </motion.div>
-    );
+    return <LoadingSpinner message="Cargando proyectos..." description="Preparando una muestra de mi trabajo" />;
   }
 
   return (
@@ -214,21 +57,7 @@ const Projects: React.FC = () => {
       exit={{ opacity: 0 }}
       className="min-h-screen pt-24 pb-16 px-4 relative"
     >
-      {/* Botón para volver arriba */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            onClick={scrollToTop}
-            className="fixed right-6 bottom-6 z-50 bg-gradient-to-r from-blue-600 to-teal-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-            aria-label="Volver arriba"
-          >
-            <ChevronDown size={24} className="transform rotate-180" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      <ScrollToTop />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -344,11 +173,7 @@ const Projects: React.FC = () => {
                 transition={{ delay: index * 0.1, duration: 0.3 }}
                 className="bg-gray-800/30 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-700/50 hover:border-teal-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-teal-400/5"
               >
-                <ProjectCard 
-                  project={project} 
-                  isExpanded={expandedProject === project.id}
-                  onToggleExpand={() => toggleProjectExpand(project.id)}
-                />
+                <ProjectCard project={project} />
               </motion.div>
             ))}
           </motion.div>
