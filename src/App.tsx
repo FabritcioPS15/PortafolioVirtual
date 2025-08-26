@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
+import Blog from './pages/Blog';
 import CustomCursor from './components/CustomCursor';
 import BackgroundEffect from './components/BackgroundEffect';
 import LoadingScreen from './components/LoadingScreen';
@@ -40,6 +41,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/projects" element={<Projects />} />
+              <Route path="/blog" element={<Blog />} />
               <Route path="/contact" element={<Contact />} />
             </Routes>
           </AnimatePresence>
